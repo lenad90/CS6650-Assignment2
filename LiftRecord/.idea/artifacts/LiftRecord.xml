@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="LiftRecord">
+    <output-path>$PROJECT_DIR$/out/artifacts/LiftRecord</output-path>
+    <root id="archive" name="LiftRecord.war">
+      <element id="artifact" artifact-name="LiftRecord:war exploded" />
+    </root>
+  </artifact>
+</component>
