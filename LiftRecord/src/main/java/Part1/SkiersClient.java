@@ -21,9 +21,9 @@ public class SkiersClient {
     ApiClient client = skierApi.getApiClient();
     BlockingQueue<SkiersRunner> dataBuffer = new LinkedBlockingQueue<>();
 
-    //client.setBasePath("http://localhost:8080/LiftServer_war");
-    client.setBasePath("http://ec2-54-218-60-162.us-west-2.compute.amazonaws.com:8080/LiftServer_war");
-//    client.setBasePath("http://localhost:8080/LiftServer_war/");
+    //client.setBasePath("http://localhost:8080/LiftServer_copy_war/");
+    client.setBasePath("http://lb2-4149791.us-west-2.elb.amazonaws.com:8080/LiftServer_war/");
+    //client.setBasePath("http://localhost:8080/lab2_war/");
     new Thread(new Producer(NUM_POSTS, dataBuffer)).start();
 
     int phase1Threads = processors * 4;

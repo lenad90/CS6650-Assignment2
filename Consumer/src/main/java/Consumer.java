@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Consumer {
   private static final String QUEUE_NAME = "LiftServer";
-  private static final Integer NUM_THREADS = 5;
+  private static final Integer NUM_THREADS = 1000;
   private static Map<String, String> map = new ConcurrentHashMap<>();
 
   public static void main(String[] argv) throws Exception {

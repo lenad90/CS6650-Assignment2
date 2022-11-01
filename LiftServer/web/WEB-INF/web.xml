@@ -6,7 +6,6 @@
   <servlet>
     <servlet-name>SkiersServlet</servlet-name>
     <servlet-class>SkiersServlet</servlet-class>
-    <load-on-startup>0</load-on-startup>
   </servlet>
 
   <servlet-mapping>

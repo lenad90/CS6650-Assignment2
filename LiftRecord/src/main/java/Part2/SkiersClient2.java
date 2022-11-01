@@ -27,46 +27,56 @@ public class SkiersClient2 {
 
     SkiersApi skierApi = new SkiersApi();
     ApiClient client = skierApi.getApiClient();
-    BlockingQueue<SkiersRunner> dataBuffer2 = new LinkedBlockingQueue<>();
+    BlockingQueue<SkiersRunner> dataBuffer = new LinkedBlockingQueue<>();
 
-    client.setBasePath("http://ec2-35-93-20-47.us-west-2.compute.amazonaws.com:8080/LiftSpringServerWar");
+    client.setBasePath("http://lb2-4149791.us-west-2.elb.amazonaws.com:8080/LiftServer_war/");
 
     File file = new File("LiftRecordPerformanceSpring.csv");
     dataPerformance.add(new String[]{"Start Time", "Request Type", "Latency", "Response Code"});
 
-    new Thread(new Producer(NUM_POSTS, dataBuffer2)).start();
+    new Thread(new Producer(NUM_POSTS, dataBuffer)).start();
 
-    int phase1Threads = processors*4;
-    int phase1Post = 2050;
-    int phase2Trigger = phase1Threads/4;
+    int phase1Threads = processors * 4;
+    int phase1Post = 1000;
+    int phase2Trigger = phase1Threads / 4;
+
 
     long start = System.currentTimeMillis();
     CountDownLatch phase2Signal = new CountDownLatch(phase2Trigger);
     Phase phase1 = new Phase("Phase 1", phase1Threads, phase1Post, skierApi,
-        phase2Signal, dataBuffer2);
+        phase2Signal, dataBuffer);
     phase1.startPhase();
 
     int phase2Threads = phase1Threads * 2;
-    int phase2Post = 1500;
-    CountDownLatch phase3Signal = new CountDownLatch((int) (phase2Threads * 0.1));
+    int phase2Post = 801;
+    CountDownLatch phase3Signal = new CountDownLatch((int) (phase2Threads * 0.5));
     Phase phase2 = new Phase("Phase 2", phase2Threads, phase2Post, skierApi,
-        phase3Signal, dataBuffer2);
+        phase3Signal, dataBuffer);
     phase2Signal.await();
     phase2.startPhase();
 
+
     int phase3Threads = phase2Threads * 2;
-    int phase3Post = 300;
-    CountDownLatch phase4Trigger = new CountDownLatch((int) (phase3Threads*0.1));
+    int phase3Post = 500;
+    CountDownLatch phase4Signal = new CountDownLatch((int) (phase3Threads*0.3));
     Phase phase3 = new Phase("Phase 3", phase3Threads,
-        phase3Post, skierApi, phase4Trigger, dataBuffer2);
+        phase3Post, skierApi, phase4Signal, dataBuffer);
     phase3Signal.await();
     phase3.startPhase();
+
+    int phase4Threads = phase3Threads * 2;
+    int phase4Post = 206;
+    CountDownLatch completeTrigger = new CountDownLatch((int) (phase4Threads*0.1));
+    Phase phase4 = new Phase("Phase 4", phase4Threads,
+        phase4Post, skierApi, completeTrigger, dataBuffer);
+    phase4Signal.await();
+    phase4.startPhase();
 
     phase1.finishPhase();
     phase2.finishPhase();
     phase3.finishPhase();
+    phase4.finishPhase();
     long end = System.currentTimeMillis();
-
 
     try {
       BufferedWriter outputFile = new BufferedWriter(new FileWriter(file));

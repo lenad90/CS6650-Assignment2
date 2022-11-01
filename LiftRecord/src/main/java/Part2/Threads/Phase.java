@@ -1,7 +1,5 @@
 package Part2.Threads;
 
-import static java.lang.Math.round;
-
 import Part2.Model.SkiersRunner;
 import io.swagger.client.api.SkiersApi;
 import java.util.concurrent.BlockingQueue;
@@ -20,14 +18,14 @@ public class Phase {
   private final CountDownLatch phaseFinish;
 
   public Phase(String phaseOption, Integer numThreads, Integer numPosts, SkiersApi skierApi,
-      CountDownLatch phaseSignal, BlockingQueue<SkiersRunner> dataBuffer2) {
+      CountDownLatch phaseSignal, BlockingQueue<SkiersRunner> dataBuffer) {
     this.phaseOption = phaseOption;
     this.numThreads = numThreads;
     this.numPosts = numPosts;
     this.phaseFinish = new CountDownLatch(this.numThreads);
     this.phaseSignal = phaseSignal;
     this.skierApi = skierApi;
-    this.dataBuffer = dataBuffer2;
+    this.dataBuffer = dataBuffer;
   }
 
   public void startPhase() throws InterruptedException {
@@ -47,7 +45,4 @@ public class Phase {
   public void finishPhase() throws InterruptedException {
     this.phaseFinish.await();
   }
-
-//  public void termination() throws InterruptedException {
-//  }
 }

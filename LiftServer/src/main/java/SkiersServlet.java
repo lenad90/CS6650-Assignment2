@@ -1,5 +1,6 @@
 import static com.squareup.okhttp.internal.Internal.logger;
 
+import com.rabbitmq.client.MessageProperties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
@@ -13,31 +14,32 @@ import com.rabbitmq.client.Channel;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
-@WebServlet(name = "SkiersServlet", value = "/SkiersServlet")
+@WebServlet(name = "SkiersServlet", value = "/skiers")
 public class SkiersServlet extends HttpServlet {
   private final Integer NUM_CHANNELS = 5;
   private final static String QUEUE_NAME = "LiftServer";
   private GenericObjectPool<Channel> pool;
 
-  @Override
-  public void init() {
+  public void init() throws ServletException {
+    super.init();
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("172.31.15.42");
     factory.setUsername("full_access");
     factory.setPassword("s3crEt");
+    factory.setVirtualHost("/");
+    factory.setPort(5672);
     try {
       Connection connection = factory.newConnection();
       this.pool = new GenericObjectPool<>(new ChannelBufferFactory(connection));
       for (int i = 0; i < NUM_CHANNELS; i++) {
         pool.addObject();
       }
+      System.out.println("in init");
     } catch (Exception e) {
       System.out.println("Error in creating pool.");
       e.printStackTrace();
     }
   }
-
-
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,15 +68,24 @@ public class SkiersServlet extends HttpServlet {
     if (!isValidatedURL(urlPath) || !isJsonValidated(requestJson)) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     } else {
+      Channel chan = null;
       try {
-        Channel chan = pool.borrowObject();
+        chan = pool.borrowObject();
         String message = arrOfUrl[arrOfUrl.length - 1] + "/" + requestJson;
         chan.queueDeclare(QUEUE_NAME, false, false, false, null);
-        chan.basicPublish("", QUEUE_NAME, null, message.getBytes());
-        pool.returnObject(chan);
+        chan.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());
       } catch (Exception e) {
         logger.info("failed to send message to RabbitMQ");
         e.printStackTrace();
+      } finally {
+        try {
+          if(chan != null) {
+            pool.returnObject(chan);
+          }
+        } catch (Exception e) {
+          logger.info("failed to return object to pool");
+          e.printStackTrace();
+        }
       }
       response.setStatus(HttpServletResponse.SC_CREATED);
       response.getWriter().write("It works!");

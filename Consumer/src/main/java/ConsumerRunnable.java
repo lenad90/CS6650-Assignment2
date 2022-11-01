@@ -24,7 +24,7 @@ public class ConsumerRunnable implements Runnable {
   public void run() {
     try {
       this.channel.queueDeclare(this.queueName, false, false, false, null);
-      this.channel.basicQos(10);
+      this.channel.basicQos(1);
       DeliverCallback threadCallback = (consumerTag, delivery) -> {
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         String[] arrOfMessage = message.split("/");
