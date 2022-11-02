@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Consumer {
   private static final String QUEUE_NAME = "LiftServer";
-  private static final Integer NUM_THREADS = 1000;
+  private static final Integer NUM_THREADS = 60;
   private static Map<String, String> map = new ConcurrentHashMap<>();
 
   public static void main(String[] argv) throws Exception {
@@ -16,6 +16,8 @@ public class Consumer {
     factory.setHost("172.31.15.42");
     factory.setUsername("full_access");
     factory.setPassword("s3crEt");
+    factory.setVirtualHost("/");
+    factory.setPort(5672);
     Connection connection = factory.newConnection();
     ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
     for (int i = 0; i < NUM_THREADS; i++) {

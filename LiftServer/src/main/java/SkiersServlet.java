@@ -20,8 +20,7 @@ public class SkiersServlet extends HttpServlet {
   private final static String QUEUE_NAME = "LiftServer";
   private GenericObjectPool<Channel> pool;
 
-  public void init() throws ServletException {
-    super.init();
+  public void init() {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("172.31.15.42");
     factory.setUsername("full_access");
@@ -34,7 +33,6 @@ public class SkiersServlet extends HttpServlet {
       for (int i = 0; i < NUM_CHANNELS; i++) {
         pool.addObject();
       }
-      System.out.println("in init");
     } catch (Exception e) {
       System.out.println("Error in creating pool.");
       e.printStackTrace();
