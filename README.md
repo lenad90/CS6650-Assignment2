@@ -13,11 +13,15 @@ The Consumer program is a POJO that creates threads connecting to the same queue
 
 <b>DataGeneration</b>
 	SkiersDataGeneration uses an Abstract Factory design pattern to generate random data for the JSON file.
+	
 <b>Model</b>
 	SkiersRunner is a POJO that stores information regarding the generated data.
+	
 <b>Threads</b>
 	The producer class puts the SkiersRunner into a BlockingQueue and the consumer runnable then takes the SkiersRunner object to run the POST requests each phase. There’s one producer thread producing and multiple consumer threads consuming. The SkiersClient runs 32, 64, and 128 threads in three different phases, and each phase displays the number of successful and unsuccessful posts, Wall Time, and the actual/expected throughput in the Phase class. Thread execution occurs in the Phase class and it’s where most of the thread creation, termination, and printing of the statistics of each phase happens. A thread-pool is used in this class to manage the consumer thread and ensure that threads are always running. Concurrency tools, such as AtomicIntegers and Collections.synchronizedList, were also used to ensure that the variables were thread-safe during the entire process.
+	
 <b>Client</b>
 SkiersClient manages calling the threads, initializing the ApiClient, and handling the print statements.
+
 <b>Calculations</b>
 A calculations class is created in part2 of the assignment, and it is used to compute the mean, median, 99th percentile, min, and max.
