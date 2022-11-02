@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="LiftServer:war">
-    <output-path>$PROJECT_DIR$/out/artifacts/LiftServer_war</output-path>
-    <root id="archive" name="LiftServer_war.war">
-      <element id="artifact" artifact-name="LiftServer:war exploded" />
-    </root>
-  </artifact>
-</component>
